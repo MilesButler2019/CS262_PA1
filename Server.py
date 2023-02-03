@@ -69,9 +69,13 @@ class ChatServer(object):
             #Send message
             return self.send_message(data)
 
-        
 
-
+    def delete_account(self,data):
+        if data['username'] in self.accounts:
+            del self.accounts[data['username']]
+            return "Account deleted successfully"
+        else:
+            return "Account doesn't exist"
 
     def create_account(self,data):
         if data['username'] in self.accounts:

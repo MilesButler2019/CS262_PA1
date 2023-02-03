@@ -11,7 +11,7 @@ First Start Server in a terminal window
 
 Then in a new terminal window create an account with the Server 
 
-`python Client.py -create_account -username 'test' -password 'test_pwd'`
+`python Client.py -create_account --username 'test' --password 'test_pwd'`
 
 
 
