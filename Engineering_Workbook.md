@@ -25,3 +25,12 @@ We wanted to be as simplistic as possible within our protocal our protical tenta
 ## Failed Attempts
 
 We attempted to send the data as a serialized string and many issues trying to read it on the server side as a dict. We ended up using the buil in eval method in python to read the data in as a dict
+
+
+## Tests
+
+The Edge Cases we cover were
+
+- Creating and Deleting Account
+- Creating Duplicate Accounts
+- Deleteing Non Existing Account
