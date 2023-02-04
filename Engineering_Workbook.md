@@ -24,8 +24,10 @@ We wanted to be as simplistic as possible within our protocal our protical tenta
 
 ## Failed Attempts
 
-We attempted to send the data as a serialized string and many issues trying to read it on the server side as a dict. We ended up using the buil in eval method in python to read the data in as a dict
+We attempted to send the data as a serialized string and many issues trying to read it on the server side as a dict. We ended up using the buil in eval method in python to read the data in as a dict. 
 
+
+After Implementing basic functions such as create account and delete account we realized that we shouldn't instantly close the connection in cases where the user user sould login and stay logged in. We have to change how we handle these certain requests. After Implementing User input we also forgot about our original wire protocal and had to go back and modify our code to include it. We ended up almost only implementing the wire protocal 1 way from client to server and not in reverse
 
 ## Tests
 
