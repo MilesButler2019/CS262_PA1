@@ -1,6 +1,10 @@
 
 import socket
 import threading
+import time
+from collections import defaultdict
+import datetime
+
 
 class ChatServer(object):
     def __init__(self, host):
@@ -15,6 +19,8 @@ class ChatServer(object):
         #Create a dictionary to store the accounts
         self.accounts = {}
         self.user_session = None
+        self.all_inbox = defaultdict(list)
+        
 
 
     def process_request(self, client):
@@ -48,41 +54,44 @@ class ChatServer(object):
         print("New connection from " + str(address))
         #Send the welcome message
         self.welcome(client)
-       
+        self.chat_menu(client)
+
 
     def welcome(self,client):
          #Send Welcome Message and ask for login or create account
-        welcome = "Welcome to the chat server! Please type 1 to login or 2 to create an account: "
-        client.send(welcome.encode('utf-8'))
-        
-        response = self.process_request(client)
-        if response == "1":
-            #Login and with username and password
-            self.login(client,response)
-            
-        elif response == "2":
-            #create account with username and password
-            self.create_account(client,response)
+        while True:
+            welcome = "Welcome to the chat server! Please type 1 to login or 2 to create an account: "
+            client.send(welcome.encode('utf-8'))
+                    
+            response = self.process_request(client)
+            if response == "1":
+                #Login and with username and password
+                self.login(client,response)
+    
+            elif response == "2":
+                #create account with username and password
+                self.create_account(client,response)
 
-        else:
-            client.send("Invalid input".encode('utf-8'))
-            client.close()
-            return False  
+                
     
     #Chat Menu is only accessible after login or create account
     def chat_menu(self,client):
-        client.send("Type LS to list all users, MSG to send a message, LOGOUT to logout, DEL to delete your account: ".encode('utf-8'))
-        response = self.process_request(client)
-        if response.lower() == "ls":
-            self.list_users(response,client)
-        # elif response.lower() == "msg":
-            # self.send_message(response,client)
-        elif response.lower() == "logout":
-            self.logout(response,client)
-        elif response.lower() == "del":
-            self.delete_account(self.user_session,client)
-        elif response.lower() == "session":
-            client.send(str(self.user_session).encode('utf-8'))
+        while True:
+            print(self.user_session, "is logged in")
+            client.send("Type LS to list all users, MSG to send a message, INBOX to see your messages, LOGOUT to logout, DEL to delete your account: ".encode('utf-8'))
+            response = self.process_request(client)
+            if response.lower() == "ls":
+                self.list_users(response,client)
+            elif response.lower() == "msg":
+                self.send_message(response,client)
+            elif response.lower() == "inbox":
+                self.inbox(response,client)
+            elif response.lower() == "logout":
+                self.logout(response,client)
+            elif response.lower() == "del":
+                self.delete_account(self.user_session,client)
+            elif response.lower() == "session":
+                client.send(str(self.user_session).encode('utf-8'))
 
     def login_menu(self,client,data):
         # Login Menu to get username and password
@@ -101,11 +110,12 @@ class ChatServer(object):
         #Create account if it doesn't exist
         else:
             self.accounts[creds['username']] = creds['password']
-            client.send("Account created successfully \n".encode('utf-8'))
             #Set the user session to the username
             self.user_session = creds['username']
-            while True:
-                    self.chat_menu(client)
+            self.all_inbox[creds['username']] = []
+            client.send("Account created successfully hit enter to confirm\n".encode('utf-8'))
+            self.process_request(client)
+            self.chat_menu(client)
                     
 
 
@@ -117,40 +127,70 @@ class ChatServer(object):
         if creds['username'] in self.accounts:
             #Check if password is correct
             if self.accounts[creds['username']] == creds['password']:
-                client.send("Login successful \n".encode('utf-8'))
+                client.send("Login successful hit enter to confirm\n".encode('utf-8'))
+                self.process_request(client)
                 #Set the user session to the username
                 self.user_session = creds['username']
-                while True:
-                    self.chat_menu(client)
+                self.chat_menu(client)
+                
             #If password is incorrect
             else:
                 client.send("Incorrect password \n".encode('utf-8'))
-                #Set the user session to the username
-                self.login(client,data)
-                client.close()
+                self.welcome(client)
         #If account doesn't exist
         else:
             client.send("Account doesn't exist \n".encode('utf-8'))
-            self.login(client,data)
+            self.welcome(client)
           
         
     def logout(self,data,client):
-        client.send("Logging out... \n".encode('utf-8'))
+        client.send("Logging out... hit enter to confirm\n".encode('utf-8'))
+        self.user_session = None
+        self.process_request(client)
         self.welcome(client)
 
     def list_users(self,data,client):
+        output = ""
         for i in self.accounts.keys():
-            output = i + "\n"
-            client.send(output.encode('utf-8'))
+            output += i + "\n"
+        output += "hit enter to confirm\n"
+        client.send(output.encode('utf-8'))
+        self.process_request(client)
 
     def delete_account(self,data,client):
         if data in self.accounts:
             del self.accounts[data]
-            client.send("Account deleted successfully \n".encode('utf-8'))
+            client.send("Account deleted successfully hit enter to confirm\n".encode('utf-8'))
+            self.process_request(client)
             self.welcome(client)
         else:
             client.send("Account doesn't exist \n".encode('utf-8'))
-            self.chat_menu(client)
+
+    def send_message(self,data,client):
+        client.send("Please enter the username of the person you want to send a message to: ".encode('utf-8'))
+        username = self.process_request(client)
+        client.send("Please enter the message you want to send: ".encode('utf-8'))
+        message = self.process_request(client)
+        self.all_inbox[username].append({'from':username,'content':message,'time':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+        client.send("Message sent successfully hit enter to confirm\n".encode('utf-8'))
+        self.process_request(client)
+        self.chat_menu(client)
+    
+    def inbox(self,data,client):
+      
+
+        print(self.all_inbox[self.user_session])
+        output = ""
+        for i in self.all_inbox[self.user_session]:
+            output += "------------------------------------------\n"
+            output += "From: " + i['from'] + "\n"
+            output += "Content: " + i['content'] + "\n"
+            output += "Time: " + i['time'] + "\n"
+            output += "------------------------------------------\n"
+
+        output += "Press enter to confirm\n"
+        client.send(output.encode('utf-8'))
+        self.process_request(client)
 
  
 
