@@ -3,7 +3,7 @@
 
 
 ## Design Decisions
-We first started with a simple Client - Server approach to grasp our understanding of sockets although we quickly realized that we wanted to have a server that could handle multiple clients at once. We did some research and found out that we needed to use a Thread for each client. We also started out by using a dictionary to hold account and password information. 
+We first started with a simple Client - Server approach to grasp our understanding of sockets although we quickly realized that we wanted to have a server that could handle multiple clients at once. We did some research and found out that we needed to use a Thread for each client. We also started out by using a dictionary to hold account and password information. Default dict to set a base value of no message in inbox and allow us to have a list for each inbox. 
 
 
 
@@ -27,7 +27,7 @@ We wanted to be as simplistic as possible within our protocal our protical tenta
 We attempted to send the data as a serialized string and many issues trying to read it on the server side as a dict. We ended up using the buil in eval method in python to read the data in as a dict. 
 
 
-After Implementing basic functions such as create account and delete account we realized that we shouldn't instantly close the connection in cases where the user user sould login and stay logged in. We have to change how we handle these certain requests. After Implementing User input we also forgot about our original wire protocal and had to go back and modify our code to include it. We ended up almost only implementing the wire protocal 1 way from client to server and not in reverse
+After Implementing basic functions such as create account and delete account we realized that we shouldn't instantly close the connection in cases where the user user sould login and stay logged in. We have to change how we handle these certain requests. After Implementing User input we also forgot about our original wire protocal and had to go back and modify our code to include it. We ended up almost only implementing the wire protocal 1 way from client to server and not in reverse. We had some issues with the inbox feature, and ended up using deafult dict.
 
 ## Tests
 
@@ -36,3 +36,5 @@ The Edge Cases we cover were
 - Creating and Deleting Account
 - Creating Duplicate Accounts
 - Deleteing Non Existing Account
+- Messaging someone who doesn't have an account
+- When Inbox is empty
