@@ -7,24 +7,29 @@ PORT = 65432  # The port used by the server
 
 
 if __name__ == "__main__":
-   
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-u", "--username", help="Username")
-    parser.add_argument("-p", "--password", help="Password")
-    parser.add_argument("-t", "--type", help="Request type")
-    args = parser.parse_args()
-    if args.username:
-        username = args.username
-    if args.password:
-        password = args.password
-    if args.type:
-        request_type = args.type
-    message = "{'request_type':" + request_type + ", 'username':'" + username + "', 'password':'" + password + "'}"
+
+    # args = parser.parse_args()
+    # if args.username:
+    #     username = args.username
+    # if args.password:
+    #     password = args.password
+    # if args.type:
+    #     request_type = args.type
+    # 
+
+
 
      # Create a socket (SOCK_STREAM means a TCP socket)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
-        s.sendall(message.encode('utf-8'))
-        data = s.recv(1024)
+        while True:
+            data = s.recv(1024).decode('utf-8')
+            user_input = input(data)
+            server_version = "0"
+            request_type = "0"
+            message = "{'server_version':" + server_version + ",'request_type':" + request_type + ", 'data':'" + user_input + "'}"
+            s.sendall(message.encode('utf-8'))
+        # s.sendall(message.encode('utf-8'))
+        # data = s.recv(1024)
 
-    print(f"Received {data!r}")
+    # print(f"Received {data!r}")

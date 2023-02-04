@@ -11,7 +11,9 @@ First Start Server in a terminal window
 
 Then in a new terminal window create an account with the Server 
 
-`python Client.py -create_account --username 'test' --password 'test_pwd'`
+`python Client.py`
+
+`Welcome to the chat server! Please type 1 to login or 2 to create an account:`
 
 
 
