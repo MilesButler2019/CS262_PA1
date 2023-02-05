@@ -13,9 +13,9 @@ Then in a new terminal initiate client
 
 `python Client.py`
 
-Example Creation of an Account
+## Example Creation of an Account
 
-`Welcome to the chat server! Please type 1 to login or 2 to create an account:` 2 <br>
+`Welcome to the chat server! Please type 1 to login or 2 to create an account:2 `  <br>
 `Please enter your username: test `<br>
 `Please enter your password: test `<br>
 `Account created successfully hit enter to confirm` <br>
