@@ -12,13 +12,19 @@ class ChatServer(object):
         self.host = host
         self.port = 65432
         self.server_version = 0
-        #Create the socket and bind it to the host and port
+        #Create the socket 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #Set the socket timeout to 5 minutes
+        self.sock.settimeout(300000)
+        #Set the socket to reuse the address
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        #Bind the socket to the host and port
         self.sock.bind((self.host, self.port))
         #Create a dictionary to store the accounts
         self.accounts = {}
+        #Variable to track the current user
         self.user_session = None
+        #Create a dictionary to store the inbox
         self.all_inbox = defaultdict(list)
         
 
@@ -27,15 +33,16 @@ class ChatServer(object):
 
         #Wire protocol
         #Decode the data and turn it into a dictionary so we can access it using eval
-        response = client.recv(1024).decode('utf-8')
-        response = eval(response)
+        while True:
+            response = client.recv(1024).decode('utf-8')
+            response = eval(response)
 
-        if response['server_version'] != self.server_version:
-            client.send("Invalid server version".encode('utf-8'))
-            client.close()
-            return False
+            if response['server_version'] != self.server_version:
+                client.send("Invalid server version".encode('utf-8'))
+                client.close()
+                return False
 
-        return response['data']
+            return response['data']
 
     def listen(self):
         #Listen for connections and start a new thread for each connection
@@ -45,7 +52,6 @@ class ChatServer(object):
         self.sock.listen(5)
         while True:
             client, address = self.sock.accept()
-            client.settimeout(60)
             threading.Thread(target = self.listenToClient,args = (client,address)).start()
 
 
@@ -53,24 +59,24 @@ class ChatServer(object):
     def listenToClient(self, client, address):
         print("New connection from " + str(address))
         #Send the welcome message
-        self.welcome(client)
-        self.chat_menu(client)
-
+        while True:
+            self.welcome(client)
+        # self.welcome(client)
+   
 
     def welcome(self,client):
          #Send Welcome Message and ask for login or create account
-        while True:
-            welcome = "Welcome to the chat server! Please type 1 to login or 2 to create an account: "
-            client.send(welcome.encode('utf-8'))
+        welcome = "Welcome to the chat server! Please type 1 to login or 2 to create an account: "
+        client.send(welcome.encode('utf-8'))
                     
-            response = self.process_request(client)
-            if response == "1":
+        response = self.process_request(client)
+        if response == "1":
                 #Login and with username and password
-                self.login(client,response)
+            self.login(client,response)
     
-            elif response == "2":
+        elif response == "2":
                 #create account with username and password
-                self.create_account(client,response)
+            self.create_account(client,response)
 
                 
     
@@ -92,6 +98,8 @@ class ChatServer(object):
                 self.delete_account(self.user_session,client)
             elif response.lower() == "session":
                 client.send(str(self.user_session).encode('utf-8'))
+            else:
+                client.send("Invalid input".encode('utf-8'))
 
     def login_menu(self,client,data):
         # Login Menu to get username and password
@@ -177,8 +185,6 @@ class ChatServer(object):
         self.chat_menu(client)
     
     def inbox(self,data,client):
-      
-
         print(self.all_inbox[self.user_session])
         output = ""
         for i in self.all_inbox[self.user_session]:

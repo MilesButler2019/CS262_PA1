@@ -36,5 +36,10 @@ The Edge Cases we cover were
 - Creating and Deleting Account
 - Creating Duplicate Accounts
 - Deleteing Non Existing Account
-- Messaging someone who doesn't have an account
+- Logging into Deleted Account
 - When Inbox is empty
+- Listing All users
+- Checking that deleted users don't appear in ls
+- Invalid Input from user 
+- Messaging someone who doesn't have an account
+- Message with no content
