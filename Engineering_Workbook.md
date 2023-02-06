@@ -6,6 +6,11 @@
 We first started with a simple Client - Server approach to grasp our understanding of sockets although we quickly realized that we wanted to have a server that could handle multiple clients at once. We did some research and found out that we needed to use a Thread for each client. We also started out by using a dictionary to hold account and password information. Default dict to set a base value of no message in inbox and allow us to have a list for each inbox. 
 
 
+<img width="655" alt="Screen Shot 2023-02-06 at 2 34 35 PM" src="https://user-images.githubusercontent.com/47306315/217067587-b048d4cf-a0ac-41e3-a63a-d6f97a17228d.png">
+
+
+
+
 
 ## Wire Protocal
 
