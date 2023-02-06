@@ -14,8 +14,7 @@ class ChatServer(object):
         self.server_version = 0
         #Create the socket 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #Set the socket timeout to 5 minutes
-        self.sock.settimeout(300000)
+        
         #Set the socket to reuse the address
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         #Bind the socket to the host and port
@@ -36,7 +35,7 @@ class ChatServer(object):
         while True:
             response = client.recv(1024).decode('utf-8')
             response = eval(response)
-
+            
             if response['server_version'] != self.server_version:
                 client.send("Invalid server version".encode('utf-8'))
                 client.close()
@@ -50,8 +49,11 @@ class ChatServer(object):
 
         #Listen for connections and start a new thread for each connection totalled to 5 connections
         self.sock.listen(5)
+
         while True:
             client, address = self.sock.accept()
+            #Set the socket timeout to 5 minutes
+            client.settimeout(300)
             threading.Thread(target = self.listenToClient,args = (client,address)).start()
 
 
@@ -77,6 +79,7 @@ class ChatServer(object):
         elif response == "2":
                 #create account with username and password
             self.create_account(client,response)
+            
 
                 
     
