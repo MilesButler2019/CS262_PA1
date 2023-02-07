@@ -3,7 +3,9 @@ import argparse
 # Add command line arguments
 HOST = "127.0.0.1"  # The server's hostname or IP address
 PORT = 65432  # The port used by the server
-
+server_version = "0"
+request_type = "0"
+encoding_type = 'utf-8'
 
 
 if __name__ == "__main__":
@@ -17,9 +19,8 @@ if __name__ == "__main__":
             data = s.recv(1024).decode('utf-8')
             # take user input
             user_input = input(data)
-            server_version = "0"
-            request_type = "0"
-            message = "{'server_version':" + server_version + ",'request_type':" + request_type + ", 'data':'" + user_input + "'}"
+          
+            message = "{'server_version':" + server_version + ",'request_type':" + request_type + ", 'payload':'" + user_input + "'}"
             s.sendall(message.encode('utf-8'))
  
 

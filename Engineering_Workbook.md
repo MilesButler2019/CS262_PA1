@@ -43,3 +43,5 @@ The Edge Cases we cover were
 - Invalid Input from user 
 - Messaging someone who doesn't have an account
 - Message with no content
+- Test invalid encoding type
+- Test invalid server version 

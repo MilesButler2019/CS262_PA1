@@ -12,9 +12,9 @@ class ChatServer(object):
         self.host = host
         self.port = 65432
         self.server_version = 0
+        # self.encoding_type = 'utf-8'
         #Create the socket 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
         #Set the socket to reuse the address
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         #Bind the socket to the host and port
@@ -40,8 +40,11 @@ class ChatServer(object):
                 client.send("Invalid server version".encode('utf-8'))
                 client.close()
                 return False
+            # if response['encoding_type'] != self.encoding_type:
+            #     client.send("Invalid encoding type".encode('utf-8'))
+            #     client.close()
 
-            return response['data']
+            return response['payload']
 
     def listen(self):
         #Listen for connections and start a new thread for each connection
