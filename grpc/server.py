@@ -14,6 +14,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
         super().__init__()
         self.accounts = {"test":"test","test1":"test1"}
         self.all_inbox = {}
+        self.user_sessions = []
         self.user_session = None
 
 
@@ -27,8 +28,6 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
       
 
     def CreateAccount(self, request, context):
-        print(request.username)
-        print(request.password)
         if request.username in self.accounts:
             reply =  chat_pb2.AccountStatus(AccountStatus=0,message='user name already exists')
             return reply
@@ -44,6 +43,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
                     default_message = chat_pb2.Message(content="Welcome say something nice",sent_time=formatted_datetime,src = "Server",dest=request.username)
                     self.all_inbox[request.username]["Server"].append(default_message)
                 self.user_session = request.username
+                self.user_sessions.append(request.username)
                 reply =  chat_pb2.AccountStatus(AccountStatus=1,message='Account Created Sucsessfully')
                 return reply
             except:
@@ -55,6 +55,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
         try:
             if self.accounts[request.username] ==  request.password:
                 self.user_session = request.username
+                self.user_sessions.append( request.username)
                 reply =  chat_pb2.AccountStatus(AccountStatus=1,message='Login Success')
                 return reply
             else:
@@ -64,11 +65,22 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
             reply =  chat_pb2.AccountStatus(AccountStatus=0,message='incorrect username')
             return reply
 
+    def LogOut(self, request, context):
+        try:
+            reply = chat_pb2.AccountStatus(AccountStatus=1,message="You are sucsessfully logged out")
+            self.user_sessions.remove(self.user_session)
+            self.user_session = None
+            return reply
+        except:
+            reply = chat_pb2.AccountStatus(AccountStatus=0,message="Error logging out")
+            return reply
+
 
     def DeleteAccount(self,request,context):
         try:
             if request.username in self.accounts:
                 del self.accounts[request.username]
+                del self.user_sessions[self.user_sessions.index(request.username)]
                 reply =  chat_pb2.AccountStatus(AccountStatus=1,message='Account deleted successfully')
                 return reply
             else:
@@ -100,46 +112,22 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
                     current_datetime = datetime.datetime.now()
                     formatted_datetime = current_datetime.strftime("%d-%Y %H:%M")
                     message = chat_pb2.Message(content=request.content,sent_time=formatted_datetime,src=self.user_session,dest=request.dest)
-                    #Should update sender and reciever inbox
-                    # if request.des
-
                     if self.all_inbox[request.dest][request.src]:
-                        #  = []
+    
                         self.all_inbox[request.dest][request.src].append(message)
                     else:
-                        print("caught")
+                        # if request.dest not in self.accounts:
+                            # message = chat_pb2.MessageStatus(message_status=0,message="Error Sending Messag - User doesn't exist")
+                            # yield message
                         self.all_inbox[request.dest][request.src] = []
                         self.all_inbox[request.dest][request.src].append(message)
                     # self.all_inbox[request.src][request.dest].append(message)
-                    print("messagedest:",message.dest)
                     message = chat_pb2.MessageStatus(message_status=1,message="Message Sent")
                     yield message
                 except:
                     message = chat_pb2.MessageStatus(message_status=0,message="Error Sending Message")
                     yield message
-            # return reply
-                # print("blah")
-                # print(request.recipient)
-                # print(request.content)
-                # print(request.sent_time)
-                # if request.username in self.accounts:
-                    # auth_mesg = chat_pb2.AuthMessage(message = 'user name already exists')
-
-    
-        
-    #         delayed_reply.AccountStatus = 1
-    #         return delayed_reply
-
-            
-    #         # return delayed_reply
-    #         # if request_iter.username in self.accounts:
-    #         #     print('user name already exists')
-    #         #     return chat_pb2.AccountStatus(AccountStatus=0)
-    #         # else:
-    #         #     self.accounts[request_iter.username] == request.password
-    #         #     return chat_pb2.AccountStatus(AccountStatus=1)
-            
-            
+   
         
 
 def serve():

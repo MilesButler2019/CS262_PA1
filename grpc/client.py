@@ -69,8 +69,11 @@ def run():
                         for i in get_users_reply:
                             print(i)
                     if rpc_call.lower() == "logout":
-                        print("You are sucsessfully logged out")
-                        break
+                        req = chat_pb2.Request(username=rpc_call)
+                        reply = stub.LogOut(req)
+                        print(reply.message)
+                        if reply.AccountStatus == 1:
+                            break
 
                     if rpc_call.lower() == "msg":
                         rpc_call = input("Who do you want to chat with? ")
@@ -87,7 +90,7 @@ def run():
                         user = chat_pb2.Request()
                         server_reply = stub.getInbox(user)
                         for i in server_reply:
-                            print("From:",i.src,"on:",i.sent_time,"\n","----------------","\n",i.content)
+                            print("----------------","\n","From:",i.src,"on:",i.sent_time,"\n","\n",i.content,"\n")
                         # print(delayed)
                     if rpc_call.lower() == "del":
                         #Add try excepts here for robustness and uptime

@@ -10,6 +10,7 @@ service ChatService  {
     rpc LogIn(Credentials) returns (AccountStatus){}
     rpc SendChat(stream Message) returns (stream MessageStatus) {}
     rpc DeleteAccount(Credentials) returns (AccountStatus) {}
+    rpc LogOut(Request) returns (AccountStatus) {}
 }
 
 

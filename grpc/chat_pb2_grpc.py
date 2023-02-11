@@ -44,6 +44,11 @@ class ChatServiceStub(object):
                 request_serializer=chat__pb2.Credentials.SerializeToString,
                 response_deserializer=chat__pb2.AccountStatus.FromString,
                 )
+        self.LogOut = channel.unary_unary(
+                '/ChatService/LogOut',
+                request_serializer=chat__pb2.Request.SerializeToString,
+                response_deserializer=chat__pb2.AccountStatus.FromString,
+                )
 
 
 class ChatServiceServicer(object):
@@ -85,6 +90,12 @@ class ChatServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def LogOut(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChatServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -116,6 +127,11 @@ def add_ChatServiceServicer_to_server(servicer, server):
             'DeleteAccount': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteAccount,
                     request_deserializer=chat__pb2.Credentials.FromString,
+                    response_serializer=chat__pb2.AccountStatus.SerializeToString,
+            ),
+            'LogOut': grpc.unary_unary_rpc_method_handler(
+                    servicer.LogOut,
+                    request_deserializer=chat__pb2.Request.FromString,
                     response_serializer=chat__pb2.AccountStatus.SerializeToString,
             ),
     }
@@ -226,6 +242,23 @@ class ChatService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/ChatService/DeleteAccount',
             chat__pb2.Credentials.SerializeToString,
+            chat__pb2.AccountStatus.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def LogOut(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ChatService/LogOut',
+            chat__pb2.Request.SerializeToString,
             chat__pb2.AccountStatus.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
