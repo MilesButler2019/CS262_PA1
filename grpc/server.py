@@ -36,12 +36,12 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
         else:
             try:
                 self.accounts[request.username] = request.password
-                self.all_inbox[request.username] = {}
-                # for i in range(10):
-                    # current_datetime = datetime.datetime.now()
-                    # formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
-                    # default_message = chat_pb2.Message(content="Welcome say something nice",sent_time=formatted_datetime,recipient = "Server")
-                    # self.all_inbox[request.username].append(default_message)
+                self.all_inbox[request.username] = []
+                for i in range(10):
+                    current_datetime = datetime.datetime.now()
+                    formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
+                    default_message = chat_pb2.Message(content="Welcome say something nice",sent_time=formatted_datetime,src = "Server",dest=request.username)
+                    self.all_inbox[request.username].append(default_message)
                 reply =  chat_pb2.AccountStatus(AccountStatus=1,message='Account Created Sucsessfully')
                 return reply
             except:
@@ -76,12 +76,12 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
             return reply
     
     def getInbox(self, request, context):
-
+        
         if request.username in self.accounts:
             for i in self.all_inbox[request.username]:
                 yield i
         else:
-            reply = chat_pb2.Message(content="User not found",sent_time="today",recipient = request.username)
+            reply = chat_pb2.Message(content="User not found",sent_time="today",dest = request.dest,src="server")
             return reply
 
                 
@@ -96,7 +96,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
                     current_datetime = datetime.datetime.now()
                     formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
                     message = chat_pb2.Message(content=request.content,sent_time=formatted_datetime,src=request.src,dest=request.dest)
-                    self.all_inbox[request.src][request.dest].append(message)
+                    # self.all_inbox[request.recipient][]  = 
                     message = chat_pb2.MessageStatus(message_status=1,message="Message Sent")
                     yield message
                 except:

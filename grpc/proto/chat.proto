@@ -29,6 +29,7 @@ message Credentials {
 }
 message Request {
     int32 request_status = 1;
+    string username = 2;
 }
 
 message MessageStatus {

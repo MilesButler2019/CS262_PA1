@@ -75,7 +75,7 @@ def run():
 
                     if rpc_call.lower() == "msg":
                         rpc_call = input("Who do you want to chat with? ")
-                        user = chat_pb2.Credentials(username=rpc_call)
+                        user = chat_pb2.Request(username=rpc_call)
                         server_reply = stub.getInbox(user)
                         for i in server_reply:
                             print(i.sent_time,i.content)
