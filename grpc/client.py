@@ -8,7 +8,7 @@ import datetime
 
 
 
-def client_login_stream_requests(user,from_user):
+def client_login_stream_requests(user):
     while True:
         current_datetime = datetime.datetime.now()
         formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
@@ -59,7 +59,7 @@ def run():
             
             if login_indicator:       
                 while True:
-                    rpc_call = input("Type LS to list all users, MSG to send a message, INBOX to see your messages, LOGOUT to logout, DEL to delete your account: ")
+                    rpc_call = input("Type LS to list all users, MSG to send a message, INBOX to see your messages, LOGOUT to logout, DEL to delete your account, ACC for acount information: ")
                         
 
                     if rpc_call.lower() == "ls":
@@ -83,8 +83,8 @@ def run():
                             print(i.message)
 
                     if rpc_call.lower() == "inbox":
-                        rpc_call = input("Who do you want to chat with? ")
-                        user = chat_pb2.Request(username=rpc_call)
+                        # rpc_call = input("Who do you want to chat with? ")
+                        user = chat_pb2.Request()
                         server_reply = stub.getInbox(user)
                         for i in server_reply:
                             print(i.sent_time,i.content)

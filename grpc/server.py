@@ -41,6 +41,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
                     formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
                     default_message = chat_pb2.Message(content="Welcome say something nice",sent_time=formatted_datetime,src = "Server",dest=request.username)
                     self.all_inbox[request.username].append(default_message)
+                    self.user_session = request.username
                 reply =  chat_pb2.AccountStatus(AccountStatus=1,message='Account Created Sucsessfully')
                 return reply
             except:
@@ -51,6 +52,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
         #  try and die login methd 
         try:
             if self.accounts[request.username] ==  request.password:
+                self.user_session = request.username
                 reply =  chat_pb2.AccountStatus(AccountStatus=1,message='Login Success')
                 return reply
             else:
@@ -75,9 +77,9 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
             return reply
     
     def getInbox(self, request, context):
-
-        if request.username in self.accounts:
-            for i in self.all_inbox[request.username]:
+        print(self.user_session)
+        if self.user_session in self.accounts:
+            for i in self.all_inbox[self.user_session]:
                 yield i
         else:
             reply = chat_pb2.Message(content="User not found",sent_time="today",dest = request.dest,src="server")
