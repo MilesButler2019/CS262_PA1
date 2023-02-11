@@ -24,8 +24,13 @@ class ChatServiceStub(object):
                 request_serializer=chat__pb2.Request.SerializeToString,
                 response_deserializer=chat__pb2.Message.FromString,
                 )
-        self.CreateAccount = channel.stream_unary(
+        self.CreateAccount = channel.unary_unary(
                 '/ChatService/CreateAccount',
+                request_serializer=chat__pb2.Credentials.SerializeToString,
+                response_deserializer=chat__pb2.AccountStatus.FromString,
+                )
+        self.LogIn = channel.unary_unary(
+                '/ChatService/LogIn',
                 request_serializer=chat__pb2.Credentials.SerializeToString,
                 response_deserializer=chat__pb2.AccountStatus.FromString,
                 )
@@ -56,7 +61,13 @@ class ChatServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CreateAccount(self, request_iterator, context):
+    def CreateAccount(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def LogIn(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -87,8 +98,13 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     request_deserializer=chat__pb2.Request.FromString,
                     response_serializer=chat__pb2.Message.SerializeToString,
             ),
-            'CreateAccount': grpc.stream_unary_rpc_method_handler(
+            'CreateAccount': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateAccount,
+                    request_deserializer=chat__pb2.Credentials.FromString,
+                    response_serializer=chat__pb2.AccountStatus.SerializeToString,
+            ),
+            'LogIn': grpc.unary_unary_rpc_method_handler(
+                    servicer.LogIn,
                     request_deserializer=chat__pb2.Credentials.FromString,
                     response_serializer=chat__pb2.AccountStatus.SerializeToString,
             ),
@@ -147,7 +163,7 @@ class ChatService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def CreateAccount(request_iterator,
+    def CreateAccount(request,
             target,
             options=(),
             channel_credentials=None,
@@ -157,7 +173,24 @@ class ChatService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/ChatService/CreateAccount',
+        return grpc.experimental.unary_unary(request, target, '/ChatService/CreateAccount',
+            chat__pb2.Credentials.SerializeToString,
+            chat__pb2.AccountStatus.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def LogIn(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ChatService/LogIn',
             chat__pb2.Credentials.SerializeToString,
             chat__pb2.AccountStatus.FromString,
             options, channel_credentials,
