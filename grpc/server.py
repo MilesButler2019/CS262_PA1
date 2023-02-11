@@ -13,7 +13,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
     def __init__(self) -> None:
         super().__init__()
         self.accounts = {"test":"test","test1":"test1"}
-        self.all_inbox = defaultdict(list)
+        self.all_inbox = {}
         self.user_session = None
 
 
@@ -21,7 +21,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
         for i in self.accounts.keys():
             creds = chat_pb2.Credentials()
             creds.username = i
-            time.sleep(.2)
+            time.sleep(.1)
             yield creds
 
       
@@ -35,13 +35,15 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
         else:
             try:
                 self.accounts[request.username] = request.password
-                self.all_inbox[request.username] = []
+                self.all_inbox[request.username] = defaultdict(list)
+                
                 for i in range(10):
                     current_datetime = datetime.datetime.now()
                     formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
+                    self.all_inbox[request.username]["Server"] = []
                     default_message = chat_pb2.Message(content="Welcome say something nice",sent_time=formatted_datetime,src = "Server",dest=request.username)
-                    self.all_inbox[request.username].append(default_message)
-                    self.user_session = request.username
+                    self.all_inbox[request.username]["Server"].append(default_message)
+                self.user_session = request.username
                 reply =  chat_pb2.AccountStatus(AccountStatus=1,message='Account Created Sucsessfully')
                 return reply
             except:
@@ -77,10 +79,11 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
             return reply
     
     def getInbox(self, request, context):
-        print(self.user_session)
         if self.user_session in self.accounts:
-            for i in self.all_inbox[self.user_session]:
-                yield i
+            for i,v in self.all_inbox[self.user_session].items():
+                for mes in self.all_inbox[self.user_session][i]:
+                    time.sleep(.1)
+                    yield mes
         else:
             reply = chat_pb2.Message(content="User not found",sent_time="today",dest = request.dest,src="server")
             return reply
@@ -95,10 +98,19 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
             for request in request_iter:
                 try:
                     current_datetime = datetime.datetime.now()
-                    formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
-                    message = chat_pb2.Message(content=request.content,sent_time=formatted_datetime,dest=request.dest)
-                    self.all_inbox[request.dest].append(message)
-                    # self.all_inbox[request.recipient][]  = 
+                    formatted_datetime = current_datetime.strftime("%d-%Y %H:%M")
+                    message = chat_pb2.Message(content=request.content,sent_time=formatted_datetime,src=self.user_session,dest=request.dest)
+                    #Should update sender and reciever inbox
+                    # if request.des
+
+                    if self.all_inbox[request.dest][request.src]:
+                        #  = []
+                        self.all_inbox[request.dest][request.src].append(message)
+                    else:
+                        print("caught")
+                        self.all_inbox[request.dest][request.src] = []
+                        self.all_inbox[request.dest][request.src].append(message)
+                    # self.all_inbox[request.src][request.dest].append(message)
                     print("messagedest:",message.dest)
                     message = chat_pb2.MessageStatus(message_status=1,message="Message Sent")
                     yield message

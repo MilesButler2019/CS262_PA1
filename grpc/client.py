@@ -75,9 +75,9 @@ def run():
                     if rpc_call.lower() == "msg":
                         rpc_call = input("Who do you want to chat with? ")
                         user = chat_pb2.Request(username=rpc_call)
-                        server_reply = stub.getInbox(user)
-                        for i in server_reply:
-                            print(i.sent_time,i.content)
+                        # server_reply = stub.getInbox(user)
+                        # for i in server_reply:
+                            # print(i.sent_time,i.content)
                         delayed = stub.SendChat(client_login_stream_requests(user))
                         for i in delayed:
                             print(i.message)
@@ -87,7 +87,7 @@ def run():
                         user = chat_pb2.Request()
                         server_reply = stub.getInbox(user)
                         for i in server_reply:
-                            print(i.sent_time,i.content)
+                            print("From:",i.src,"on:",i.sent_time,"\n","----------------","\n",i.content)
                         # print(delayed)
                     if rpc_call.lower() == "del":
                         #Add try excepts here for robustness and uptime
