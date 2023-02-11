@@ -24,7 +24,6 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
             time.sleep(.2)
             yield creds
 
-
       
 
     def CreateAccount(self, request, context):
@@ -76,7 +75,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
             return reply
     
     def getInbox(self, request, context):
-        
+
         if request.username in self.accounts:
             for i in self.all_inbox[request.username]:
                 yield i
@@ -95,8 +94,10 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
                 try:
                     current_datetime = datetime.datetime.now()
                     formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
-                    message = chat_pb2.Message(content=request.content,sent_time=formatted_datetime,src=request.src,dest=request.dest)
+                    message = chat_pb2.Message(content=request.content,sent_time=formatted_datetime,dest=request.dest)
+                    self.all_inbox[request.dest].append(message)
                     # self.all_inbox[request.recipient][]  = 
+                    print("messagedest:",message.dest)
                     message = chat_pb2.MessageStatus(message_status=1,message="Message Sent")
                     yield message
                 except:

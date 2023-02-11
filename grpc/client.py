@@ -8,7 +8,7 @@ import datetime
 
 
 
-def client_login_stream_requests():
+def client_login_stream_requests(user,from_user):
     while True:
         current_datetime = datetime.datetime.now()
         formatted_datetime = current_datetime.strftime("%d-%m-%Y %H:%M:%S")
@@ -16,7 +16,7 @@ def client_login_stream_requests():
         if text == "":
             break
         # time.sleep(1)
-        message = chat_pb2.Message(content=text,sent_time= formatted_datetime)
+        message = chat_pb2.Message(content=text,sent_time= formatted_datetime,dest=user.username)
         yield message
         # time.sleep(1)
 
@@ -30,7 +30,6 @@ def run():
             rpc_call = input("Welcome to the chat server! Please type 1 to login or 2 to create an account: ")
 
             login_indicator = False
-
             if rpc_call in ["1","2"]:
                 while login_indicator != True:
                     username = input("Please Enter your username: ")
@@ -79,8 +78,17 @@ def run():
                         server_reply = stub.getInbox(user)
                         for i in server_reply:
                             print(i.sent_time,i.content)
-                        delayed = stub.SendChat(client_login_stream_requests())
-                        print(delayed)
+                        delayed = stub.SendChat(client_login_stream_requests(user))
+                        for i in delayed:
+                            print(i.message)
+
+                    if rpc_call.lower() == "inbox":
+                        rpc_call = input("Who do you want to chat with? ")
+                        user = chat_pb2.Request(username=rpc_call)
+                        server_reply = stub.getInbox(user)
+                        for i in server_reply:
+                            print(i.sent_time,i.content)
+                        # print(delayed)
                     if rpc_call.lower() == "del":
                         #Add try excepts here for robustness and uptime
                         confirm = input("Are you sure you want to delete your accont? (y/n)")
