@@ -174,13 +174,14 @@ class Client:
                         if server_reply.AccountStatus == 1:
                             break
     
-
-if __name__ == '__main__':
-
+def main():
     try:
         c = Client()
         c.login()
         c.main_menu()
-    except KeyboardInterrupt:
+    except:
         #Logs user out on termination
         c.exit_logout()
+
+# if __name__ == "main":
+# main()

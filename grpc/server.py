@@ -50,6 +50,7 @@ class Listener(chat_pb2_grpc.ChatServiceServicer):
 
                 self.user_sessions.append(request.username)
                 reply =  chat_pb2.AccountStatus(AccountStatus=1,message='Account Created Sucsessfully')
+                print(request.username,"has made an account")
                 return reply
             except:
                 reply =  chat_pb2.AccountStatus(AccountStatus=0,message='Error Creating Account, Try Again')
