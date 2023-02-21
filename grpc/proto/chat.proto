@@ -8,9 +8,12 @@ service ChatService  {
     rpc getInbox(Request) returns (stream Message) {}
     rpc CreateAccount(Credentials) returns (AccountStatus) {}
     rpc LogIn(Credentials) returns (AccountStatus){}
-    rpc SendChat(stream Message) returns (stream MessageStatus) {}
+    rpc SendChat(Message) returns (MessageStatus) {}
     rpc DeleteAccount(Credentials) returns (AccountStatus) {}
     rpc LogOut(Request) returns (AccountStatus) {}
+    rpc ChatStream(StreamRequest) returns (stream Message) {}
+    rpc CheckUserOnline(Request) returns (AccountStatus) {} 
+
 }
 
 
@@ -32,6 +35,14 @@ message Request {
     int32 request_status = 1;
     string username = 2;
 }
+
+message StreamRequest {
+    int32 id = 1;
+    string src = 2;
+    string dest = 3;
+
+}
+
 
 message MessageStatus {
     int32 message_status = 1;

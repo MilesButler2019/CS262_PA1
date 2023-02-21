@@ -34,7 +34,7 @@ class ChatServiceStub(object):
                 request_serializer=chat__pb2.Credentials.SerializeToString,
                 response_deserializer=chat__pb2.AccountStatus.FromString,
                 )
-        self.SendChat = channel.stream_stream(
+        self.SendChat = channel.unary_unary(
                 '/ChatService/SendChat',
                 request_serializer=chat__pb2.Message.SerializeToString,
                 response_deserializer=chat__pb2.MessageStatus.FromString,
@@ -46,6 +46,16 @@ class ChatServiceStub(object):
                 )
         self.LogOut = channel.unary_unary(
                 '/ChatService/LogOut',
+                request_serializer=chat__pb2.Request.SerializeToString,
+                response_deserializer=chat__pb2.AccountStatus.FromString,
+                )
+        self.ChatStream = channel.unary_stream(
+                '/ChatService/ChatStream',
+                request_serializer=chat__pb2.StreamRequest.SerializeToString,
+                response_deserializer=chat__pb2.Message.FromString,
+                )
+        self.CheckUserOnline = channel.unary_unary(
+                '/ChatService/CheckUserOnline',
                 request_serializer=chat__pb2.Request.SerializeToString,
                 response_deserializer=chat__pb2.AccountStatus.FromString,
                 )
@@ -78,7 +88,7 @@ class ChatServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def SendChat(self, request_iterator, context):
+    def SendChat(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -91,6 +101,18 @@ class ChatServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def LogOut(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ChatStream(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CheckUserOnline(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -119,7 +141,7 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     request_deserializer=chat__pb2.Credentials.FromString,
                     response_serializer=chat__pb2.AccountStatus.SerializeToString,
             ),
-            'SendChat': grpc.stream_stream_rpc_method_handler(
+            'SendChat': grpc.unary_unary_rpc_method_handler(
                     servicer.SendChat,
                     request_deserializer=chat__pb2.Message.FromString,
                     response_serializer=chat__pb2.MessageStatus.SerializeToString,
@@ -131,6 +153,16 @@ def add_ChatServiceServicer_to_server(servicer, server):
             ),
             'LogOut': grpc.unary_unary_rpc_method_handler(
                     servicer.LogOut,
+                    request_deserializer=chat__pb2.Request.FromString,
+                    response_serializer=chat__pb2.AccountStatus.SerializeToString,
+            ),
+            'ChatStream': grpc.unary_stream_rpc_method_handler(
+                    servicer.ChatStream,
+                    request_deserializer=chat__pb2.StreamRequest.FromString,
+                    response_serializer=chat__pb2.Message.SerializeToString,
+            ),
+            'CheckUserOnline': grpc.unary_unary_rpc_method_handler(
+                    servicer.CheckUserOnline,
                     request_deserializer=chat__pb2.Request.FromString,
                     response_serializer=chat__pb2.AccountStatus.SerializeToString,
             ),
@@ -213,7 +245,7 @@ class ChatService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def SendChat(request_iterator,
+    def SendChat(request,
             target,
             options=(),
             channel_credentials=None,
@@ -223,7 +255,7 @@ class ChatService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_stream(request_iterator, target, '/ChatService/SendChat',
+        return grpc.experimental.unary_unary(request, target, '/ChatService/SendChat',
             chat__pb2.Message.SerializeToString,
             chat__pb2.MessageStatus.FromString,
             options, channel_credentials,
@@ -258,6 +290,40 @@ class ChatService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/ChatService/LogOut',
+            chat__pb2.Request.SerializeToString,
+            chat__pb2.AccountStatus.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ChatStream(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/ChatService/ChatStream',
+            chat__pb2.StreamRequest.SerializeToString,
+            chat__pb2.Message.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CheckUserOnline(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/ChatService/CheckUserOnline',
             chat__pb2.Request.SerializeToString,
             chat__pb2.AccountStatus.FromString,
             options, channel_credentials,

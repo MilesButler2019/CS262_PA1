@@ -21,6 +21,18 @@ def client_login_stream_requests(user):
         # time.sleep(1)
 
 
+def listen_for_messages(self):
+        """
+        This method will be ran in a separate thread as the main/ui thread, because the for-in call is blocking
+        when waiting for new messages
+        """
+        for note in self.conn.ChatStream(chat.Empty()):  # this line will wait for new messages from the server!
+            print("R[{}] {}".format(note.name, note.message))  # debugging statement
+            self.chat_list.insert(END, "[{}] {}\n".format(note.name, note.message))  # add the message to the UI
+
+
+
+
 
 def run():
     with grpc.insecure_channel("localhost:9999") as channel:
@@ -100,9 +112,10 @@ def run():
                             password = input("Please Enter your password: ")
                             creds = chat_pb2.Credentials(username=username,password=password)
                             server_reply = stub.DeleteAccount(creds)
-                            print(server_reply)
+                            print(server_reply.message)
                             if server_reply.AccountStatus == 1:
                                 break
+               
                             
 
 

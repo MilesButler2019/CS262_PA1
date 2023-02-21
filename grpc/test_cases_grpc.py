@@ -9,11 +9,6 @@ import sys
 import signal
 import uuid
 
-# def connect():
-#     with grpc.insecure_channel("localhost:9999") as channel:
-#         stub = chat_pb2_grpc.ChatServiceStub(channel)
-#     return stub
-
 #Client Tests
 
 class TestCreateDuplicate(unittest.TestCase):
@@ -39,7 +34,7 @@ class TestCreateReg(unittest.TestCase):
 
 class TestDeleteBasic(unittest.TestCase):
     account = str(uuid.uuid4())
-    @patch('builtins.input', side_effect=["2",account,"test",de])
+    @patch('builtins.input', side_effect=["2",account,"test","del","y",account,"test"])
     def runTest(self, input_mock):
         #Stores Command line output
         sys.stdout = StringIO()
@@ -47,7 +42,7 @@ class TestDeleteBasic(unittest.TestCase):
         try:
             client.run()
         except: 
-            self.assertIn('Account Created Sucsessfully\n', str(sys.stdout.getvalue()))
+            self.assertIn('Account deleted successfully\n', str(sys.stdout.getvalue()))
 
 
 class TestLogin(unittest.TestCase):
@@ -77,4 +72,4 @@ class TestLogout(unittest.TestCase):
 
     
 if __name__ == '__main__':
-    print(unittest.main())
+    unittest.main()
