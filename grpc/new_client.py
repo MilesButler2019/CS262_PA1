@@ -183,5 +183,4 @@ def main():
         #Logs user out on termination
         c.exit_logout()
 
-# if __name__ == "main":
-# main()
+main()
