@@ -8,8 +8,7 @@ request_type = "0"
 encoding_type = 'utf-8'
 
 
-if __name__ == "__main__":
-
+def main():
     # Create a socket (SOCK_STREAM means a TCP socket)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
@@ -25,3 +24,4 @@ if __name__ == "__main__":
  
 
     # print(f"Received {data!r}")
+main()

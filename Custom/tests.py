@@ -1,57 +1,165 @@
 import unittest
-import socket
+import Client
+from unittest.mock import patch
+from io import StringIO 
+import sys
+import time
 
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 65432 
+#Client Tests
 
-
-def connect_to_server(message):
-    # Create a socket (SOCK_STREAM means a TCP socket)
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
-        s.sendall(message.encode('utf-8'))
-        data = s.recv(1024)
-    return data
+test_account_1 = "jay"
+test_account_2 = "def"
 
 
-#Test cases for creating an account
-class TestCreateBasicCreateAndDelete(unittest.TestCase):
-    def runTest(self):
-        
-        #Test creating account
-        message = "{'request_type':0, 'username':'username ', 'password':'password'}"
-        data = connect_to_server(message)
-        self.assertEqual(data,b"Account created successfully","Error creating account")
 
-        #Test deleting account
-        message = "{'request_type':1, 'username':'username ', 'password':'password'}"
-        data = connect_to_server(message)
-        self.assertEqual(data,b"Account deleted successfully","Error deleting account")
-      
-        
 
-class TestCreateDuplicateAccount(unittest.TestCase):
-    def runTest(self):
+class TestCreateReg(unittest.TestCase):
+    @patch('builtins.input', side_effect=["2",test_account_1,"test"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn('Account Created Sucsessfully\n', str(sys.stdout.getvalue()))
 
-        #Send same request twice to create duplicate account
-        message = "{'request_type':0, 'username':'username ', 'password':'password'}"
-        data = connect_to_server(message)
-        data = connect_to_server(message)
-        self.assertEqual(data,b"Account already exists","Error creating duplicate account")
+class TestLoginBasic(unittest.TestCase):
+    @patch('builtins.input', side_effect=["1",test_account_1,"test"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn('Login Success\n', str(sys.stdout.getvalue()))
+
+class TestLoginBasicWrongPassword(unittest.TestCase):
+    @patch('builtins.input', side_effect=["1",test_account_1,"test1"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn('bad password\n', str(sys.stdout.getvalue()))
+
+class TestLoginBasicWrongUserName(unittest.TestCase):
+    @patch('builtins.input', side_effect=["1","blah","test"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn('incorrect username\n', str(sys.stdout.getvalue()))     
+
+class TestLogout(unittest.TestCase):
+    @patch('builtins.input', side_effect=["1",test_account_1,"test",'logout'])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        try:
+            Client.main()
+        except: 
+            self.assertIn('You are sucsessfully logged out\n', str(sys.stdout.getvalue()))
+
+class TestMakeDuplicate(unittest.TestCase):
+    @patch('builtins.input', side_effect=["2",test_account_1,"test"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        try:
+            Client.main()
+        except: 
+            self.assertIn('user name already exists\n', str(sys.stdout.getvalue()))
+
+
+
+class TestRemoveAccountWrongUsername(unittest.TestCase):
+    @patch('builtins.input', side_effect=["1",test_account_1,"test","del","y","blah","test"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn('Account not Found\n', str(sys.stdout.getvalue()))
+
+class TestRemoveAccountWrongPassword(unittest.TestCase):
+    @patch('builtins.input', side_effect=["1",test_account_1,"test","del","y",test_account_1,"test1"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn('Account not Found\n', str(sys.stdout.getvalue()))
+
+class TestRemoveFinallyAccount(unittest.TestCase):
+    @patch('builtins.input', side_effect=["1",test_account_1,"test","del","y",test_account_1,"test"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn('Account deleted successfully\n', str(sys.stdout.getvalue()))
+
+class TestRemoveFinallyAccountLogin(unittest.TestCase):
+    #Tests logging into delted account
+    @patch('builtins.input', side_effect=["1",test_account_1,"test"])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn('incorrect username\n', str(sys.stdout.getvalue()))
+
+class TestMessageNonExistUser(unittest.TestCase):
+    #Tests message from user that doesnt exist
+    @patch('builtins.input', side_effect=["1",test_account_2,"test",'msg','chat'])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn("User doesn't exist", str(sys.stdout.getvalue()))
+
+class TestMessageBasic(unittest.TestCase):
+    #This just sends a message to be tested in next testcase
+    @patch('builtins.input', side_effect=["1",test_account_2,"test",'msg','bard','sup bro','exit'])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertEqual(1,1)
+            # pass
+
+class TestListingUsers (unittest.TestCase):
+    #Test that message has HAS been recieved
+    @patch('builtins.input', side_effect=["1","bard","test",'ls'])
+    def runTest(self, input_mock):
+        #Stores Command line output
+        sys.stdout = StringIO()
+        #Need to use try expect since the programs erros out as it is epecting more user inputs but gets a iteration error
+        try:
+            Client.main()
+        except: 
+            self.assertIn("bard def", str(sys.stdout.getvalue()))
     
-        #Delete Account so that we can continue testing
-        message = "{'request_type':1, 'username':'username ', 'password':'password'}"
-        data = connect_to_server(message)
-
-
-#Test cases for deleting an account
-
-class TestDeleteNonExistingAccount(unittest.TestCase):
-    def runTest(self):
-        message = "{'request_type':1, 'username':'username ', 'password':'password'}"
-        data = connect_to_server(message)
-        self.assertEqual(data,b"Account doesn't exist","Deleted non existing account")
-
-
 if __name__ == '__main__':
     unittest.main()
